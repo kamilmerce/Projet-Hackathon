@@ -1,4 +1,4 @@
-from flask import Flask, render_template # import de flask qui est un framework pour un rendu d'une page web
+from flask import Flask, render_template, request, redirect, url_for # import de flask qui est un framework pour un rendu d'une page web
 import sqlite3 # import sqlite3 pour l'accès à la base de données
 import os # import os pour l'accès à la base de données avec un chemin
 
@@ -51,13 +51,49 @@ def index():
 
 @app.route('/ajouter', methods=['GET', 'POST'])
 def ajouter_contact():
-    return "Page d'ajout d'un nouveau contact"
+    if request.method == 'POST':
+        nom = request.form['nom']
+        prenom = request.form['prenom']
+        email = request.form['email']
+        telephone = request.form['telephone']
 
-@app.route('/modifier', methods=['GET', 'POST'])
-def modifier_contact():
-    return "Page de modification d'un contact"
+        conn = connect_to_database()
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO contacts (nom, prenom, email, telephone) VALUES (?, ?, ?, ?)',
+                       (nom, prenom, email, telephone))
+        conn.commit()
+        conn.close()
 
-@app.route('/supprimer', methods=['GET', 'POST'])
+        return redirect(url_for('index'))
+
+    return render_template('ajout.html')
+
+@app.route('/modifier_contact/<int:contact_id>', methods=['GET', 'POST'])
+def modifier_contact(contact_id):
+    conn = connect_to_database()
+    cursor = conn.cursor()
+    if request.method == 'POST':
+        nom = request.form['nom']
+        prenom = request.form['prenom']
+        email = request.form['email']
+        telephone = request.form['telephone']
+
+        # Mettre à jour le contact dans la base de données
+        cursor.execute('UPDATE contacts SET nom=?, prenom=?, email=?, telephone=? WHERE id=?',
+                       (nom, prenom, email, telephone, contact_id))
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for('index'))
+
+    # Récupérer le contact à modifier
+    cursor.execute('SELECT * FROM contacts WHERE id = ?', (contact_id,))
+    contact = cursor.fetchone()
+    conn.close()
+    return render_template('modifier_contact.html', contact=contact)
+
+
+@app.route('/supprimer', methods=['GET'])
 def supprimer_contact():
     return "Page de suppression d'un contact"
 
