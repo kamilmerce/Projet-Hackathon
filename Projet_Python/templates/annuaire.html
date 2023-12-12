@@ -11,9 +11,10 @@
   <body>
     <nav>
       <ul class="menu">
+        <li><a href="/">Annuaire</a></li>
         <li><a href="{{ url_for('ajouter_contact') }}">Ajouter</a></li>
         <li>
-          <form action="#" method="GET">
+          <form action="{{ url_for('rechercher_contact') }}" method="GET">
             <input type="text" name="search" placeholder="Rechercher..." />
             <input type="submit" value="Rechercher" />
           </form>
@@ -34,7 +35,10 @@
       </thead>
       <tbody>
         {% for contact in entries %}
-        <tr onclick="window.location.href='{{ url_for('contact_details', contact_id=contact[0]) }}';" class="invisible-link">
+        <tr
+          onclick="window.location.href='{{ url_for('contact_details', contact_id=contact[0]) }}';"
+          class="invisible-link"
+        >
           <td>{{ contact[0] }}</td>
           <td>{{ contact[1] }}</td>
           <td>{{ contact[2] }}</td>

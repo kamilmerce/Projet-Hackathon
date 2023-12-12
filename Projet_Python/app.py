@@ -40,7 +40,7 @@ def check_table_exists(): # verifie si la table contacts existe déjà
         conn.commit() # enregistrement de la table contacts
         conn.close() # fermeture de la connexion à la base de données
 
-@app.route('/') 
+@app.route('/', methods=['GET', 'POST']) 
 def index():
     conn = connect_to_database()
     cursor = conn.cursor()
@@ -56,6 +56,12 @@ def ajouter_contact():
         prenom = request.form['prenom']
         email = request.form['email']
         telephone = request.form['telephone']
+        
+        if len(telephone) != 10:
+            return "Le numéro de téléphone doit comporter 10 chiffres. Veuillez réessayer."
+        
+        if not email.endswith('@gmail.com'):
+            return "L'adresse e-mail doit se terminer par '@gmail.com'. Veuillez réessayer."
 
         conn = connect_to_database()
         cursor = conn.cursor()
@@ -70,32 +76,45 @@ def ajouter_contact():
 
 @app.route('/modifier_contact/<int:contact_id>', methods=['GET', 'POST'])
 def modifier_contact(contact_id):
-    conn = connect_to_database()
-    cursor = conn.cursor()
     if request.method == 'POST':
         nom = request.form['nom']
         prenom = request.form['prenom']
         email = request.form['email']
         telephone = request.form['telephone']
-
-        # Mettre à jour le contact dans la base de données
-        cursor.execute('UPDATE contacts SET nom=?, prenom=?, email=?, telephone=? WHERE id=?',
+        
+        if len(telephone) != 10:
+            return "Le numéro de téléphone doit comporter 10 chiffres. Veuillez réessayer."
+        
+        if not email.endswith('@gmail.com'):
+            return "L'adresse e-mail doit se terminer par '@gmail.com'. Veuillez réessayer."
+        
+        conn = connect_to_database()
+        cursor = conn.cursor()
+        cursor.execute('UPDATE contacts SET nom =?, prenom =?, email =?, telephone =? WHERE id =?',
                        (nom, prenom, email, telephone, contact_id))
         conn.commit()
         conn.close()
-
+        
         return redirect(url_for('index'))
-
-    # Récupérer le contact à modifier
-    cursor.execute('SELECT * FROM contacts WHERE id = ?', (contact_id,))
-    contact = cursor.fetchone()
+    
+    conn = connect_to_database()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM contacts WHERE id =?', (contact_id,))
+    modifie = cursor.fetchone()
     conn.close()
-    return render_template('modifier_contact.html', contact=contact)
+    return render_template('modifier_contact.html', modifie=[modifie])
 
-
-@app.route('/supprimer', methods=['GET'])
-def supprimer_contact():
-    return "Page de suppression d'un contact"
+@app.route('/supprimer/<int:contact_id>', methods=['GET', 'POST'])
+def supprimer(contact_id):
+    if request.method == 'GET':
+        conn = connect_to_database()
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM contacts WHERE id =?', (contact_id,))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('index'))
+    else:
+        pass
 
 @app.route('/contact_details/<int:contact_id>', methods=['GET'])
 def contact_details(contact_id):
@@ -104,7 +123,21 @@ def contact_details(contact_id):
     cursor.execute('SELECT * FROM contacts WHERE id =?', (contact_id,))
     detail = cursor.fetchone()
     conn.close()
-    return render_template('detail.html', entries=[detail])
+    return render_template('detail.html', detail=[detail])
+
+@app.route('/rechercher', methods=['GET'])
+def rechercher_contact():
+    terme_recherche = request.args.get('search', '')  # Récupère le terme de recherche depuis l'URL
+    
+    conn = connect_to_database()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM contacts WHERE nom LIKE ? OR prenom LIKE ? OR email LIKE ? OR telephone LIKE ?",
+                   ('%' + terme_recherche + '%', '%' + terme_recherche + '%', '%' + terme_recherche + '%', '%' + terme_recherche + '%'))
+    contacts = cursor.fetchall()
+    conn.close()
+
+    return render_template('annuaire.html', entries=contacts)
+
 
 if __name__ == '__main__':
     check_table_exists()

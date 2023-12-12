@@ -1,25 +1,55 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Modifier un contact</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Modifier un contact</h1>
-    <form action="{{ url_for('modifier_contact', contact_id=contact[0]) }}" method="post">
-        <label for="nom">Nom :</label>
-        <input type="text" id="nom" name="nom" value="{{ contact[1] }}" required><br><br>
+    <a href="/">Annuaire</a>
+    {% for modifie in modifie %}
+    <form
+      action="{{ url_for('modifier_contact', contact_id=modifie[0]) }}"
+      method="post"
+    >
+      <label for="nom">Nom :</label>
+      <input
+        type="text"
+        id="nom"
+        name="nom"
+        required
+        value="{{ modifie[1] }}"
+      /><br /><br />
 
-        <label for="prenom">Prénom :</label>
-        <input type="text" id="prenom" name="prenom" value="{{ contact[2] }}" required><br><br>
+      <label for="prenom">Prénom :</label>
+      <input
+        type="text"
+        id="prenom"
+        name="prenom"
+        required
+        value="{{ modifie[2] }}"
+      /><br /><br />
 
-        <label for="email">Email :</label>
-        <input type="email" id="email" name="email" value="{{ contact[3] }}" required><br><br>
+      <label for="email">Email :</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        required
+        value="{{ modifie[3] }}"
+      /><br /><br />
 
-        <label for="telephone">Téléphone :</label>
-        <input type="text" id="telephone" name="telephone" value="{{ contact[4] }}" required><br><br>
+      <label for="telephone">Téléphone :</label>
+      <input
+        type="text"
+        id="telephone"
+        name="telephone"
+        required
+        value="{{ modifie[4] }}"
+      /><br /><br />
 
-        <input type="submit" value="Modifier">
+      <input type="submit" value="Modifier" />
     </form>
-</body>
+    {% endfor %}
+  </body>
 </html>

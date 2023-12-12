@@ -2,17 +2,33 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Annuaire</title>
+    <title>Details</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='styles.css') }}"
     />
   </head>
+  {% for detail in detail %}
+  <script>
+    function confirmerSuppression() {
+      var confirmation = confirm("Voulez-vous vraiment supprimer le compte ?");
+
+      if (confirmation) {
+        window.location.href = '{{ url_for('supprimer', contact_id=detail[0]) }}';
+      } else {
+      }
+    }
+  </script>
   <body>
     <nav>
       <ul class="menu">
-        <li><a href="{{ url_for('modifier_contact') }}">Modifier</a></li>
-        <li><a href="{{ url_for('modifier_contact') }}">Supprimer</a></li>
+        <li><a href="/">Annuaire</a></li>
+        <li>
+          <a href="{{ url_for('modifier_contact', contact_id=detail[0]) }}"
+            >Modifier</a
+          >
+        </li>
+        <li><button onclick="confirmerSuppression()">Supprimer</button></li>
       </ul>
     </nav>
 
@@ -28,7 +44,6 @@
         </tr>
       </thead>
       <tbody>
-        {% for detail in entries %}
         <tr>
           <td>{{ detail[0] }}</td>
           <td>{{ detail[1] }}</td>
@@ -36,8 +51,8 @@
           <td>{{ detail[3] }}</td>
           <td>{{ detail[4] }}</td>
         </tr>
-        {% endfor %}
       </tbody>
     </table>
   </body>
+  {% endfor %}
 </html>
