@@ -192,6 +192,19 @@ def rechercher_contact():
 
     return render_template('annuaire.html', entries=contacts)
 
+@app.route('/tri_contacts', methods=['GET'])
+def tri_contacts():
+    champ = request.args.get('champ') 
+    sens = request.args.get('sens')
+    conn = connect_to_database()
+    cursor = conn.cursor()
+    query = f"SELECT * FROM contacts ORDER BY {champ} {sens}"
+    cursor.execute(query)
+    tries = cursor.fetchall()
+    conn.close()
+    
+    return render_template('annuaire.html', entries=tries)
+
 
 if __name__ == '__main__':
     check_table_exists()

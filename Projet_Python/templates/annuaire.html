@@ -5,7 +5,7 @@
     <title>Annuaire</title>
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}"
+      href="{{ url_for('static', filename='annuaire.css') }}"
     />
   </head>
   <body>
@@ -26,10 +26,62 @@
     <table border="1">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Nom</th>
-          <th>Prénom</th>
-          <th>Email</th>
+          <th>
+            <div class="trie-contact">
+              <p>ID</p>
+              <div class="trie">
+                <a href="{{ url_for('tri_contacts', champ='id',sens='asc') }}"
+                  >↑</a
+                >
+                <a href="{{ url_for('tri_contacts', champ='id',sens='desc') }}"
+                  >↓</a
+                >
+              </div>
+            </div>
+          </th>
+          <th>
+            <div class="trie-contact">
+              <p>Nom</p>
+              <div class="trie">
+                <a href="{{ url_for('tri_contacts', champ='nom',sens='asc') }}"
+                  >↑</a
+                >
+                <a href="{{ url_for('tri_contacts', champ='nom',sens='desc') }}"
+                  >↓</a
+                >
+              </div>
+            </div>
+          </th>
+          <th>
+            <div class="trie-contact">
+              <p>Prenom</p>
+              <div class="trie">
+                <a
+                  href="{{ url_for('tri_contacts', champ='prenom',sens='asc') }}"
+                  >↑</a
+                >
+                <a
+                  href="{{ url_for('tri_contacts', champ='prenom',sens='desc') }}"
+                  >↓</a
+                >
+              </div>
+            </div>
+          </th>
+          <th>
+            <div class="trie-contact">
+              <p>Email</p>
+              <div class="trie">
+                <a
+                  href="{{ url_for('tri_contacts', champ='email',sens='asc') }}"
+                  >↑</a
+                >
+                <a
+                  href="{{ url_for('tri_contacts', champ='email',sens='desc') }}"
+                  >↓</a
+                >
+              </div>
+            </div>
+          </th>
           <th>Téléphone</th>
         </tr>
       </thead>

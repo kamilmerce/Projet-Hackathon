@@ -3,22 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <title>Ajouter un contact</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='ajout.css') }}"
+    />
   </head>
   <body>
+    <nav>
+      <ul class="menu">
+        <li><a href="/">Annuaire</a></li>
+      </ul>
+    </nav>
     <h1>Ajouter un contact</h1>
-    <a href="/">Annuaire</a>
     <form action="/ajouter" method="post">
-      <label for="nom">Nom :</label>
-      <input type="text" id="nom" name="nom" required /><br /><br />
-
-      <label for="prenom">Prénom :</label>
-      <input type="text" id="prenom" name="prenom" required /><br /><br />
-
-      <label for="email">Email :</label>
-      <input type="email" id="email" name="email" required /><br /><br />
-
-      <label for="telephone">Téléphone :</label>
-      <input type="text" id="telephone" name="telephone" required /><br /><br />
+      <div class="nom">
+        <label for="nom">Nom :</label><br /><br />
+        <input type="text" id="nom" name="nom" required />
+      </div>
+      <div class="prenom">
+        <label for="prenom">Prénom :</label><br /><br />
+        <input type="text" id="prenom" name="prenom" required />
+      </div>
+      <div class="email">
+        <label for="email">Email :</label><br /><br />
+        <input type="email" id="email" name="email" required />
+      </div>
+      <div class="telephone">
+        <label for="telephone">Téléphone :</label><br /><br />
+        <input type="text" id="telephone" name="telephone" required />
+      </div>
 
       <input type="submit" value="Ajouter" />
     </form>

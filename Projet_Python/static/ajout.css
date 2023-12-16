@@ -1,0 +1,75 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+nav {
+    background-color: #333;
+    height: 61px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu {
+    list-style-type: none;
+    margin: 0;
+    padding: 10px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.menu li {
+    display: inline;
+    margin-right: 10px;
+}
+
+.menu li a {
+    color: white;
+    text-decoration: none;
+}
+
+.menu li a:hover {
+    color: #ddd;
+}
+
+form
+{
+    background-color: #333;
+    width: fit-content;
+    padding: 2%;
+    margin: 0 auto;
+    color: white;
+    text-align: center;
+}
+
+.nom,.prenom,.email,.telephone{
+    margin-bottom: 50px;
+}
+
+input[type="text"], input[type="email"]{
+    padding: 2%;
+    border: #333 1px solid;
+    border-radius: 20px;
+    text-align: center;
+}
+
+input:focus {
+    outline: none; /* Supprime la bordure de sélection par défaut */
+    border-color: #333; /* Couleur de la bordure lorsque le champ est en focus */
+}
+
+input[type="submit"] {
+    padding: 8%;
+    border: #333 1px solid;
+    border-radius: 20px;
+    cursor: pointer;
+}

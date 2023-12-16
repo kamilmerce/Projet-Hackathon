@@ -5,7 +5,7 @@
     <title>Details</title>
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}"
+      href="{{ url_for('static', filename='detail.css') }}"
     />
   </head>
   {% for detail in detail %}
@@ -31,7 +31,6 @@
         <li><button onclick="confirmerSuppression()">Supprimer</button></li>
       </ul>
     </nav>
-
     <h1>Détail</h1>
     <table border="1">
       <thead>
