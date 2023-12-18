@@ -1,12 +1,15 @@
-from flask import Flask, render_template, request, redirect, url_for # import de flask qui est un framework pour un rendu d'une page web
-import sqlite3 # import sqlite3 pour l'accès à la base de données
-import os # import os pour l'accès à la base de données avec un chemin
+# Importation des modules nécessaires
+from flask import Flask, render_template, request, redirect, url_for # Import de Flask pour la création d'une application web
+import sqlite3 # Import de sqlite3 pour interagir avec la base de données
+import os # Import du module os pour les opérations système
 
-app = Flask(__name__) # création d'un objet Flask 
+# Initialisation de l'application Flask
+app = Flask(__name__) 
 
+# Fonction pour établir la connexion à la base de données
 def connect_to_database(): # connexion à la base de données
     conn = sqlite3.connect('../Projet_Python/carnet_adresses.db')
-    cursor = conn.cursor() # création d'un objet cursor qui peremt de récupérer les données de la base de données
+    cursor = conn.cursor() # Création d'un objet cursor pour exécuter des requêtes SQL
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS contacts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -15,14 +18,16 @@ def connect_to_database(): # connexion à la base de données
             email TEXT,
             telephone TEXT
         )
-    ''') # création d'une table contacts si n'existe pas
-    conn.commit() # enregistrement de la table contacts
-    return conn # connexion à la base de données
+    ''') # Création d'une table "contacts" si elle n'existe pas
+    
+    conn.commit() # Enregistrement des modifications
+    return conn # Retourne l'objet de connexion à la base de données
 
-def check_table_exists(): # verifie si la table contacts existe déjà
+# Fonction pour vérifier si la table existe, sinon l'initialise avec des données fictives
+def check_table_exists(): # Vérification de l'existence de la base de données
     if not os.path.isfile('../Projet_Python/carnet_adresses.db'): # verifie si la base de données existe déjà
-        conn = connect_to_database() # connexion à la base de données
-        cursor = conn.cursor() # création d'un objet cursor qui permet de récupérer les donné
+        conn = connect_to_database() # Établissement de la connexion à la base de données
+        cursor = conn.cursor() # Création d'un objet cursor pour exécuter des requêtes SQL
         cursor.executemany('''
             INSERT INTO contacts (nom, prenom, email, telephone)
             VALUES (?, ?, ?, ?)
@@ -75,32 +80,33 @@ def check_table_exists(): # verifie si la table contacts existe déjà
                 ('Cox', 'Harper', 'harper1@gmail.com', '5678901234'),
                 ('Bishop', 'Emma', 'emma@gmail.com', '6789012345'),
         ]) # insertion de nouveaux contacts
-        conn.commit() # enregistrement de la table contacts
-        conn.close() # fermeture de la connexion à la base de données
+        conn.commit() # Enregistrement des modifications
+        conn.close() # Fermeture de la connexion à la base de données
 
+# Route pour la page d'accueil affichant tous les contacts
 @app.route('/', methods=['GET', 'POST']) 
 def index():
-    conn = connect_to_database()
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM contacts')
-    contacts = cursor.fetchall()
-    conn.close()
-    return render_template('annuaire.html', entries=contacts)
+    conn = connect_to_database() # Établissement de la connexion à la base de données
+    cursor = conn.cursor() # Création d'un objet cursor pour exécuter des requêtes SQL
+    cursor.execute('SELECT * FROM contacts')  # Récupération de tous les contacts de la table "contacts"
+    contacts = cursor.fetchall() # Récupération des résultats
+    conn.close() # Fermeture de la connexion à la base de données
+    return render_template('annuaire.html', entries=contacts) # Affichage des contacts sur la page web
 
 @app.route('/ajouter', methods=['GET', 'POST'])
 def ajouter_contact():
-    if request.method == 'POST':
-        nom = request.form['nom']
-        prenom = request.form['prenom']
-        email = request.form['email']
-        telephone = request.form['telephone']
+    if request.method == 'POST': # Vérifie si le formulaire a été envoyé
+        nom = request.form['nom'] # Récupération du nom
+        prenom = request.form['prenom'] # Récupération du prénom
+        email = request.form['email'] # Récupération du email
+        telephone = request.form['telephone'] # Récupération du numéro de téléphone
         
         conn = connect_to_database()
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM contacts WHERE telephone=?', (telephone,))
         telephone_existe = cursor.fetchone()
         
-        if telephone_existe:
+        if telephone_existe: # Vérifie si le numéro de téléphone existe déjà
             return "Le numéro de téléphone existe déjà. Veuillez réessayer."
         
         conn = connect_to_database()
@@ -108,102 +114,95 @@ def ajouter_contact():
         cursor.execute('SELECT * FROM contacts WHERE email=?', (email,))
         email_existe = cursor.fetchone()
         
-        if email_existe:
+        if email_existe: # Vérifie si le numéro de téléphone existe déjà
             return "L'adresse e-mail existe déjà. Veuillez réessayer."
-        
-        if len(telephone) != 10:
-            return "Le numéro de téléphone doit comporter 10 chiffres. Veuillez réessayer."
-        
-        if not email.endswith('@gmail.com'):
-            return "L'adresse e-mail doit se terminer par '@gmail.com'. Veuillez réessayer."
 
         conn = connect_to_database()
         cursor = conn.cursor()
         cursor.execute('INSERT INTO contacts (nom, prenom, email, telephone) VALUES (?, ?, ?, ?)',
-                       (nom, prenom, email, telephone))
+                       (nom, prenom, email, telephone)) # Enregistrement du nouveau contact
         conn.commit()
         conn.close()
 
-        return redirect(url_for('index'))
+        return redirect(url_for('index')) # Redirection vers la page d'accueil
 
-    return render_template('ajout.html')
+    return render_template('ajout.html') # Affichage de la page ajout
 
-@app.route('/modifier_contact/<int:contact_id>', methods=['GET', 'POST'])
+# Route pour la page de contact à modifier
+@app.route('/modifier_contact/<int:contact_id>', methods=['GET', 'POST']) 
 def modifier_contact(contact_id):
-    if request.method == 'POST':
+    if request.method == 'POST': # Vérifie si le formulaire a été envoyé
         nom = request.form['nom']
         prenom = request.form['prenom']
         email = request.form['email']
         telephone = request.form['telephone']
         
-        if len(telephone) != 10:
-            return "Le numéro de téléphone doit comporter 10 chiffres. Veuillez réessayer."
-        
-        if not email.endswith('@gmail.com'):
-            return "L'adresse e-mail doit se terminer par '@gmail.com'. Veuillez réessayer."
-        
         conn = connect_to_database()
         cursor = conn.cursor()
         cursor.execute('UPDATE contacts SET nom =?, prenom =?, email =?, telephone =? WHERE id =?',
-                       (nom, prenom, email, telephone, contact_id))
+                       (nom, prenom, email, telephone, contact_id)) # Modification du nouveau contact
         conn.commit()
         conn.close()
         
-        return redirect(url_for('index'))
+        return redirect(url_for('index')) # Redirection vers la page d'accueil
     
     conn = connect_to_database()
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM contacts WHERE id =?', (contact_id,))
+    cursor.execute('SELECT * FROM contacts WHERE id =?', (contact_id,)) # Récupération du contact à modifier
     modifie = cursor.fetchone()
     conn.close()
-    return render_template('modifier_contact.html', modifie=[modifie])
+    return render_template('modifier_contact.html', modifie=[modifie]) # Affichage du contact à modifier
 
+# Route pour la page de suppression d'un contact
 @app.route('/supprimer/<int:contact_id>', methods=['GET', 'POST'])
-def supprimer(contact_id):
-    if request.method == 'GET':
+def supprimer(contact_id): 
+    if request.method == 'GET': # Vérifie si le formulaire a été envoyé
         conn = connect_to_database()
         cursor = conn.cursor()
-        cursor.execute('DELETE FROM contacts WHERE id =?', (contact_id,))
+        cursor.execute('DELETE FROM contacts WHERE id =?', (contact_id,)) # Suppression du contact
         conn.commit()
         conn.close()
-        return redirect(url_for('index'))
+        return redirect(url_for('index')) # Redirection vers la page d'accueil
     else:
-        pass
+        pass # Rien faire
 
+# Route pour la page de details d'un contact
 @app.route('/contact_details/<int:contact_id>', methods=['GET'])
 def contact_details(contact_id):
     conn = connect_to_database()
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM contacts WHERE id =?', (contact_id,))
+    cursor.execute('SELECT * FROM contacts WHERE id =?', (contact_id,)) # Récupération du détail de contact 
     detail = cursor.fetchone()
     conn.close()
-    return render_template('detail.html', detail=[detail])
+    return render_template('detail.html', detail=[detail]) # Rédirection vers la page details
 
+# Route pour la recherche d'un contact
 @app.route('/rechercher', methods=['GET'])
 def rechercher_contact():
     terme_recherche = request.args.get('search', '')  # Récupère le terme de recherche depuis l'URL
     
     conn = connect_to_database()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM contacts WHERE nom LIKE ? OR prenom LIKE ? OR email LIKE ? OR telephone LIKE ?",
-                   ('%' + terme_recherche + '%', '%' + terme_recherche + '%', '%' + terme_recherche + '%', '%' + terme_recherche + '%'))
+    cursor.execute("SELECT * FROM contacts WHERE nom LIKE ? OR prenom LIKE ? OR email LIKE ?",
+                   ('%' + terme_recherche + '%', '%' + terme_recherche + '%', '%' + terme_recherche + '%')) # Récupération de tous les contacts qui contiennent le terme recherche
     contacts = cursor.fetchall()
     conn.close()
 
-    return render_template('annuaire.html', entries=contacts)
+    return render_template('annuaire.html', entries=contacts) # Redirection vers la page annuaire
 
+# Route pour la page de tri des contacts
 @app.route('/tri_contacts', methods=['GET'])
 def tri_contacts():
-    champ = request.args.get('champ') 
-    sens = request.args.get('sens')
+    champ = request.args.get('champ') # Récupère le champ de tri
+    sens = request.args.get('sens') # Récupère le sens de tri
     conn = connect_to_database()
     cursor = conn.cursor()
-    query = f"SELECT * FROM contacts ORDER BY {champ} {sens}"
+    query = f"SELECT * FROM contacts ORDER BY {champ} {sens}" # Récupération de tous les contacts de l'orde du sens de tri et le champ de tri
     cursor.execute(query)
     tries = cursor.fetchall()
     conn.close()
     
-    return render_template('annuaire.html', entries=tries)
+    return render_template('annuaire.html', entries=tries) # Redirection vers la page annuaire
 
 
 if __name__ == '__main__':

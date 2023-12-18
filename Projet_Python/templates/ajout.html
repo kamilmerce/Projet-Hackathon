@@ -3,11 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <title>Ajouter un contact</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='ajout.css') }}"
-    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='ajout.css') }}" />
   </head>
+  <script>
+    function validateForm() {
+      var email = document.getElementById('email').value;
+      var telephone = document.getElementById('telephone').value;
+  
+      if (telephone.length !== 10) {
+        alert("Le numéro de téléphone doit comporter 10 chiffres. Veuillez réessayer.");
+        return false;
+      }
+  
+      if (!email.endsWith('@gmail.com')) {
+        alert("L'adresse e-mail doit se terminer par '@gmail.com'. Veuillez réessayer.");
+        return false;
+      }
+    }
+  </script>
   <body>
     <nav>
       <ul class="menu">
@@ -15,7 +28,7 @@
       </ul>
     </nav>
     <h1>Ajouter un contact</h1>
-    <form action="/ajouter" method="post">
+    <form action="/ajouter" method="post" onsubmit="return validateForm()">
       <div class="nom">
         <label for="nom">Nom :</label><br /><br />
         <input type="text" id="nom" name="nom" required />

@@ -8,6 +8,22 @@
       href="{{ url_for('static', filename='ajout.css') }}"
     />
   </head>
+  <script>
+    function validateForm() {
+      var email = document.getElementById('email').value;
+      var telephone = document.getElementById('telephone').value;
+  
+      if (telephone.length !== 10) {
+        alert("Le numéro de téléphone doit comporter 10 chiffres. Veuillez réessayer.");
+        return false;
+      }
+  
+      if (!email.endsWith('@gmail.com')) {
+        alert("L'adresse e-mail doit se terminer par '@gmail.com'. Veuillez réessayer.");
+        return false;
+      }
+    }
+  </script>
   <body>
     <nav>
       <ul class="menu">
@@ -19,6 +35,7 @@
     <form
       action="{{ url_for('modifier_contact', contact_id=modifie[0]) }}"
       method="post"
+      onsubmit="return validateForm()"
     >
       <div class="nom">
         <label for="nom">Nom :</label><br /><br />
